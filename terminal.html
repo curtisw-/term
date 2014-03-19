@@ -1,0 +1,106 @@
+ <html>
+	<head>
+	<script src="terminal.js"></script>
+	<script src="escape_codes.js"></script>
+	<script src="keyboard.js"></script>
+	
+	<script lang="text/javascript">		
+	function escape_sequence(str, i) {
+		return str.charAt(i) == "\x1B" && str.charAt(i+1) == "["
+	}
+	
+	// All incoming text is given to this function to display.
+	function print(terminal, text) {
+		// Scroll the terminal so the user can see the results
+		terminal.reset_scroll_pos();
+	
+		var i=0;
+		while(i<text.length) {
+			if(text.charAt(i) != "\n" && text.charAt(i) != "\t") {
+				if(!escape_sequence(text, i)) {
+					terminal.write_char(text.charAt(i));
+				} else {
+					// Chop off everything before the escape sequence and the escape chars, then
+					// pass it off for processing. Afterwards, skip over the correct amount of chars
+					// and continue. The total length is 2 (length of escape code - ^[) + the length
+					// of the sequence.
+					var length = 2 + process_control_sequence(terminal, text.slice(i+2));
+					i += length;
+					continue;
+				}
+			} else if(text.charAt(i) == "\n") {
+				terminal.newline();
+			} else if(text.charAt(i) == "\t") {
+				terminal.tab();
+			}
+			i += 1;
+		}
+	}
+	
+	
+	function disp() {
+		try {
+			// Since this is just for testing purposes, evaluating the string is an easy 
+			// way to allow inputting arbitrary byte values via the escape code \x
+			print(term, eval('"' + document.forms[0][0].value + '"'));
+		} catch(e) {
+			alert("Exception " + e.name + " occurred: " + e.description);
+		}
+		
+		document.forms[0][0].value = "";
+		return false;
+	}
+	
+
+	function enable_keyboard_input(event) {
+		keyboard_interface.enabled = true;
+		this.focus();
+		
+		// Prevent the event from reaching the body, which would disable input
+		stop_propagation(event?event:window.event);
+	}
+	
+	function disable_keyboard_input(event) {
+		keyboard_interface.enabled = false;
+	}
+	
+	
+	
+	LINE_HEIGHT = 1.1;
+	WIDTH = 80;
+	HEIGHT = 24;
+	BG = 40;
+	FG = 37;
+	
+	function init() {
+		var terminal_node = document.getElementById("terminal");
+		terminal_node.parentNode.style.height = LINE_HEIGHT*HEIGHT + "em";
+		
+		terminal_node.onclick = enable_keyboard_input;
+		document.onclick = disable_keyboard_input;
+
+		term = new Terminal(terminal_node, WIDTH, HEIGHT, BG, FG, LINE_HEIGHT);
+		
+		keyboard_interface = new KeyboardInterface(term);
+	}
+	
+	</script>
+	
+	<style type="text/css">
+	body {
+		font-size: 12pt;
+		line-height: 1.1;
+	}
+	</style>
+	</head>
+	
+	<body onload="init()">
+	<div style="position: relative; left: 1em; top: 1em; overflow: hidden; width: 50em;">
+		<code id="terminal" style="position: relative; top: 0em">&nbsp;</code>
+	</div>
+	
+	<form style="position: relative; left: 1em; top: 1.2em;" onsubmit="return disp();">
+		<input type=text size=80 style="font-family: courier"></textarea>
+	</form>
+	</body>
+</html>
