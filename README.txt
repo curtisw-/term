@@ -6,3 +6,5 @@ There are two ways to interact with the terminal in the example provided. Simple
 \x1b[31m   - set the foreground color; change the 31 to be 30-39 for different colors (30 is black)
 \x1b[41m   - set the background color; change the 41 to be 40-49 for different colors (40 is black)
 \x1b[2J    - clear the terminal
+
+*** WARNING - this code is 6 years old, well before I had realized the convenience of jQuery ***
