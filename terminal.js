@@ -1,4 +1,3 @@
-
 // Provides low-level terminal routines. See the independent 'print' routine for 
 // control sequence processing and other higher level activities.
 function Terminal(
@@ -18,7 +17,9 @@ function Terminal(
 	this.num_excess_lines = 0; // Number of lines that aren't visible
 	
 	this.default_background = default_background;
-	this.default_foreground = default_foreground;	this.chars = [];
+	this.default_foreground = default_foreground;
+
+	this.chars = [];
 	this.breaks = [];
 	
 	// These start at one to be compatible with vt100 escape codes
@@ -36,7 +37,9 @@ function Terminal(
 	this.set_char_xy = set_char_xy;
 	
 	this.get_char = get_char;
-	this.get_char_xy = get_char_xy;	this.clear_char = clear_char;
+	this.get_char_xy = get_char_xy;
+
+	this.clear_char = clear_char;
 	this.clear_attributes = clear_attributes;
 	
 	this.set_attribute = set_attribute;
@@ -213,7 +216,8 @@ function get_background(color) {
 // Convert fg code to bg code
 function fg_to_bg(color) {
 	return color-foreground_offset+background_offset;
-}
+}
+
 // Convert bg code to fg code
 function bg_to_fg(color) {
 	return color-background_offset+foreground_offset;
@@ -257,11 +261,13 @@ function set_attribute(code) {
 			var bg = this.background;
 			
 			this.background = fg_to_bg(this.foreground);
-			this.foreground = bg_to_fg(bg)
-			break;			
+			this.foreground = bg_to_fg(bg);
+			break;
+			
 		case 9: // strike-through
 			this.text_decoration = "line-through";
-			break;
+			break;
+
 		
 		case 22: // normal font
 			this.bold = false;
@@ -339,7 +345,25 @@ function set_char(ch) {
 }
 
 function set_char_xy(x, y, ch) {
-	this.getxy(x, y).innerHTML = ch;}function get_char() {	return this.get().innerHTML;}function get_char_xy(x, y) {	return this.getxy(x, y).innerHTML;}function move_cursor(delta_x, delta_y) {	this.set_x(this.cursorx + delta_x);	this.set_y(this.cursory + delta_y);}
+	this.getxy(x, y).innerHTML = ch;
+}
+
+
+function get_char() {
+	return this.get().innerHTML;
+}
+
+function get_char_xy(x, y) {
+	return this.getxy(x, y).innerHTML;
+}
+
+
+function move_cursor(delta_x, delta_y) {
+	this.set_x(this.cursorx + delta_x);
+	this.set_y(this.cursory + delta_y);
+}
+
+
 function save_cursor() {
 	this.savedx = this.cursorx;
 	this.savedy = this.cursory;
@@ -397,7 +421,8 @@ function newline() {
 		
 		// Keep track of how many non-visible/immutable lines there are
 		this.num_excess_lines += this.cursory + 1 - this.height;
-	
+	
+
 		// Since the excess is still in its previous spot, move the entire terminal
 		// div up the correct amount to compensate.
 		this.container.style.top = -this.num_excess_lines*this.line_height + "em";
